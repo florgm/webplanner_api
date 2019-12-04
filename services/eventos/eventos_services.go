@@ -46,6 +46,7 @@ func GetEventos() *[]eventosDomain.Eventos {
 func ParseEvento(data []byte) (*eventosDomain.Eventos, error) {
     var evento eventosDomain.Eventos
     if err := json.Unmarshal(data, &evento); err != nil {
+		fmt.Println("Entra aca")
         return nil, err
 	}
 	

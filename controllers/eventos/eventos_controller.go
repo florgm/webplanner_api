@@ -13,9 +13,10 @@ func GetEventos(c *gin.Context) {
     
     eventos := eventosService.GetEventos()
 
-	c.JSON(http.StatusOK, gin.H{
-		"result": eventos,
-	})
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"result": eventos,
+	// })
+	c.JSON(http.StatusOK, eventos)
 }
 
 //CreateEvento esto es una función
@@ -30,7 +31,8 @@ func CreateEvento(c *gin.Context) {
         return
 	}
 
-    evento, err := eventosService.ParseEvento(data)
+	evento, err := eventosService.ParseEvento(data)
+	fmt.Println(evento)
     if err != nil {
         fmt.Println(err)
         c.JSON(

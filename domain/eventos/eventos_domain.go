@@ -14,6 +14,10 @@ type Eventos struct {
 	End 			time.Time	`json:"end"`
 }
 
+type Eventos2 struct {
+	IDUsuario 		int64 		`json:"id_usuario"`
+}
+
 //IDEvento elemento
 type IDEvento struct {
 	IDEvento int64 `json:"id_evento"`
