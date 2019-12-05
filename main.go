@@ -6,6 +6,7 @@ import (
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/cors"
   eventosControllers "./controllers/eventos"
+  tareasControllers "./controllers/tareas"
 )
 
 func main() {
@@ -36,6 +37,13 @@ func SetupRouter() *gin.Engine {
 	router.POST("/eventos", eventosControllers.CreateEvento)
 	router.DELETE("/eventos", eventosControllers.DeleteEvento)
 	router.PUT("/eventos", eventosControllers.ModifyEvento)
+
+	router.GET("/tareas", tareasControllers.GetTareas)
+	router.POST("/tareas", tareasControllers.CreateTarea)
+	router.DELETE("/tareas", tareasControllers.DeleteTarea)
+	router.PUT("/tareas", tareasControllers.CompleteTarea)
+
+
 //   v1 := router.Group("api/v1")
 //   {
 //     v1.POST("/flower", controllers.Create)
