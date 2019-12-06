@@ -46,17 +46,6 @@ func GetEventos() *[]eventosDomain.Eventos {
 func ParseEvento(data []byte) (*eventosDomain.Eventos, error) {
     var evento eventosDomain.Eventos
     if err := json.Unmarshal(data, &evento); err != nil {
-		fmt.Println("Entra aca")
-        return nil, err
-	}
-	
-    return &evento, nil
-}
-
-//ParseEventoID esto es una funcion
-func ParseEventoID(data []byte) (*eventosDomain.IDEvento, error) {
-    var evento eventosDomain.IDEvento
-    if err := json.Unmarshal(data, &evento); err != nil {
         return nil, err
 	}
 	
@@ -78,7 +67,7 @@ func CreateEvento(evento *eventosDomain.Eventos) error {
 }
 
 //DeleteEvento esto es una funcion
-func DeleteEvento(evento *eventosDomain.IDEvento) error {
+func DeleteEvento(evento *eventosDomain.Eventos) error {
 	id := evento.IDEvento
 	stmt, err := db.Init().Prepare("delete from eventos where id_evento = ?;")
 

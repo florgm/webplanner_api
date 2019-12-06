@@ -10,12 +10,7 @@ import (
 
 //GetEventos esto es una función 
 func GetEventos(c *gin.Context) {
-    
-    eventos := eventosService.GetEventos()
-
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"result": eventos,
-	// })
+	eventos := eventosService.GetEventos()
 	c.JSON(http.StatusOK, eventos)
 }
 
@@ -32,7 +27,6 @@ func CreateEvento(c *gin.Context) {
 	}
 
 	evento, err := eventosService.ParseEvento(data)
-	fmt.Println(evento)
     if err != nil {
         fmt.Println(err)
         c.JSON(
@@ -52,7 +46,7 @@ func CreateEvento(c *gin.Context) {
     }
 
 	c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Successfully created"),
+		"message": fmt.Sprintf("Successfully created"),
 	})
 }
 
@@ -68,7 +62,7 @@ func DeleteEvento(c *gin.Context) {
         return
 	}
 
-    evento, err := eventosService.ParseEventoID(data)
+    evento, err := eventosService.ParseEvento(data)
     if err != nil {
         fmt.Println(err)
         c.JSON(
@@ -88,12 +82,12 @@ func DeleteEvento(c *gin.Context) {
     }
 
 	c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Successfully deleted"),
+		"message": fmt.Sprintf("Successfully deleted"),
 	})
 }
 
-//ModifyEvento esto es una funcion
-func ModifyEvento (c *gin.Context) {
+//UpdateEvento esto es una funcion
+func UpdateEvento (c *gin.Context) {
 	data, err := utils.GetJSONBody(c.Request)
     if err != nil {
         fmt.Println(err)
@@ -124,6 +118,6 @@ func ModifyEvento (c *gin.Context) {
     }
 
 	c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Successfully modified"),
+		"message": fmt.Sprintf("Successfully modified"),
 	})
 }

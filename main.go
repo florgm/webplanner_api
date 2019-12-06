@@ -1,16 +1,12 @@
 package main
 
 import (
-  "fmt"
-
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/cors"
   eventosControllers "./controllers/eventos"
 )
 
 func main() {
-  fmt.Println("hello world")
-
   router := SetupRouter()
   router.Run(":8081")
 }
@@ -18,24 +14,20 @@ func main() {
 //SetupRouter esto es una funcion
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-	// router.Use(cors.New(cors.Config{
-	// 	AllowOrigins:     []string{"http://localhost:8888"},
-	// 	AllowHeaders:     []string{"Origin"},
-	// 	AllowCredentials: true,
-	// }))
+
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:8888"},
-		AllowMethods:     []string{"POST", "GET", "PUT", "PATCH"},
+		AllowMethods:     []string{"POST", "GET", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	// router.Use(cors.Default())
 
 	router.GET("/eventos", eventosControllers.GetEventos)
 	router.POST("/eventos", eventosControllers.CreateEvento)
 	router.DELETE("/eventos", eventosControllers.DeleteEvento)
-	router.PUT("/eventos", eventosControllers.ModifyEvento)
+	router.PUT("/eventos", eventosControllers.UpdateEvento)
+
 //   v1 := router.Group("api/v1")
 //   {
 //     v1.POST("/flower", controllers.Create)
