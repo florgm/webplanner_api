@@ -33,14 +33,6 @@ func SetupRouter() *gin.Engine {
 	router.POST("/tareas", tareasControllers.CreateTarea)
 	router.DELETE("/tareas", tareasControllers.DeleteTarea)
 	router.PUT("/tareas", tareasControllers.CompleteTarea)
-
-//   v1 := router.Group("api/v1")
-//   {
-//     v1.POST("/flower", controllers.Create)
-//     v1.GET("/flower/:id", controllers.GetFlower)
-//     v1.GET("/flowers", controllers.GetAllFlower)
-//     v1.DELETE("/flower", controllers.DeleteFlower)
-//     v1.GET("/check", controllers.HealthCheck)
-//   }
+	
   	return router
 }

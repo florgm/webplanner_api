@@ -7,6 +7,7 @@ import (
 	"fmt"
 )
 
+//GetTareas esto es una funcion
 func GetTareas() *[]tareasDomain.Tareas {
 	var (
 		tarea  tareasDomain.Tareas
@@ -37,6 +38,7 @@ func GetTareas() *[]tareasDomain.Tareas {
 	return &tareas
 }
 
+//ParseTarea esto es una funcion
 func ParseTarea(data []byte) (*tareasDomain.Tareas, error) {
 	var tarea tareasDomain.Tareas
 	if err := json.Unmarshal(data, &tarea); err != nil {
@@ -46,6 +48,7 @@ func ParseTarea(data []byte) (*tareasDomain.Tareas, error) {
 	return &tarea, nil
 }
 
+//CreateTarea esto es una funcion
 func CreateTarea(tarea *tareasDomain.Tareas) error {
 	stmt, err := db.Init().Prepare("insert into tareas (id_usuario, tarea, completado) values(?,?,?);")
 
@@ -59,6 +62,7 @@ func CreateTarea(tarea *tareasDomain.Tareas) error {
 	return err
 }
 
+//DeleteTarea esto es una funcion
 func DeleteTarea(tarea *tareasDomain.Tareas) error {
 	id := tarea.IDTarea
 	stmt, err := db.Init().Prepare("delete from tareas where id_tarea = ?;")
@@ -73,6 +77,7 @@ func DeleteTarea(tarea *tareasDomain.Tareas) error {
 	return err
 }
 
+//CompleteTarea esto es una funcion
 func CompleteTarea(tarea *tareasDomain.Tareas) error {
 	stmt, err := db.Init().Prepare("update tareas set completado=? where id_tarea=?;")
 

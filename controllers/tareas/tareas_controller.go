@@ -2,18 +2,20 @@ package tareas
 
 import (
 	"fmt"
-	"/github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"../../utils"
 	tareasService "../../services/tareas"
 )
 
+//GetTareas esto es una funcion
 func GetTareas(c *gin.Context){
 	tareas := tareasService.GetTareas()
 
 	c.JSON(http.StatusOK,tareas)
 }
 
+//CreateTarea esto es una funcion
 func CreateTarea(c *gin.Context){
 	data,err := utils.GetJSONBody(c.Request)
 	if err != nil{
@@ -34,19 +36,20 @@ func CreateTarea(c *gin.Context){
 		)
 		return
 	}
-	 if err := tareasService.CreateTarea(tarea); err != nil{
+	
+	if err := tareasService.CreateTarea(tarea); err != nil{
 	 	fmt.Println(err)
 	 	c.JSON(
 	 		http.StatusInternalServerError,
 	 		err,
 	 	)
 	 	return
-	 }
-	 c.JSON(http.StatusOK,gin.H{
-	 	"message": fmt.Sprintf("Successfully created"),
-	 })
+	}
+
+	c.JSON(http.StatusOK,tarea)
 }
 
+//DeleteTarea esto es una funcion
 func DeleteTarea(c *gin.Context) {
 	data, err := utils.GetJSONBody(c.Request)
 	if err != nil {
@@ -82,6 +85,7 @@ func DeleteTarea(c *gin.Context) {
 	})
 }
 
+//CompleteTarea esto es una funcion
 func CompleteTarea (c *gin.Context) {
 	data, err := utils.GetJSONBody(c.Request)
 	if err != nil {
