@@ -22,7 +22,7 @@ func GetTareas() *[]tareasDomain.Tareas {
 	for rows.Next() {
 		err = rows.Scan(&tarea.IDUsuario,
 			&tarea.IDTarea,
-			&tarea.Descripcion,
+			&tarea.Tarea,
 			&tarea.Completado)
 		tareas = append(tareas, tarea)
 
@@ -46,31 +46,22 @@ func ParseTarea(data []byte) (*tareasDomain.Tareas, error) {
 	return &tarea, nil
 }
 
-func ParseTareaID(data []byte) (*tareasDomain.IDTarea, error) {
-	var tarea tareasDomain.IDTarea
-	if err := json.Unmarshal(data, &tarea); err != nil {
-		return nil, err
-	}
-
-	return &tarea, nil
-}
-
 func CreateTarea(tarea *tareasDomain.Tareas) error {
-	stmt, err := db.Init().Prepare("insert into tareas (id_usuario, trarea, completado) values(?,?,?);")
+	stmt, err := db.Init().Prepare("insert into tareas (id_usuario, tarea, completado) values(?,?,?);")
 
 	if err != nil {
 		fmt.Print(err.Error())
 	}
 
-	_, err = stmt.Exec(tarea.IDUsuario, tarea.Descripcion, tarea.Completado)
+	_, err = stmt.Exec(tarea.IDUsuario, tarea.Tarea, tarea.Completado)
 
 	defer stmt.Close()
 	return err
 }
 
-func DeleteTarea(tarea *tareasDomain.IDTarea) error {
+func DeleteTarea(tarea *tareasDomain.Tareas) error {
 	id := tarea.IDTarea
-	stmt, err := db.Init().Prepare("delete form tareas where id_tarea = ?;")
+	stmt, err := db.Init().Prepare("delete from tareas where id_tarea = ?;")
 
 	if err != nil {
 		fmt.Print(err.Error())

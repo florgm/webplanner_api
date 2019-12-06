@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-  fmt.Println("hello world")
 
   router := SetupRouter()
   router.Run(":8081")
@@ -19,11 +18,7 @@ func main() {
 //SetupRouter esto es una funcion
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
-	// router.Use(cors.New(cors.Config{
-	// 	AllowOrigins:     []string{"http://localhost:8888"},
-	// 	AllowHeaders:     []string{"Origin"},
-	// 	AllowCredentials: true,
-	// }))
+
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:8888"},
 		AllowMethods:     []string{"POST", "GET", "PUT", "PATCH"},
@@ -31,7 +26,6 @@ func SetupRouter() *gin.Engine {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	// router.Use(cors.Default())
 
 	router.GET("/eventos", eventosControllers.GetEventos)
 	router.POST("/eventos", eventosControllers.CreateEvento)

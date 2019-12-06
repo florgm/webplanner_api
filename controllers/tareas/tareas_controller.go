@@ -58,7 +58,7 @@ func DeleteTarea(c *gin.Context) {
 		return
 	}
 
-	tarea, err := tareasService.ParseTareaID(data)
+	tarea, err := tareasService.ParseTarea(data)
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(
