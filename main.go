@@ -1,8 +1,6 @@
 package main
 
 import (
-  "fmt"
-
   "github.com/gin-gonic/gin"
   "github.com/gin-contrib/cors"
   eventosControllers "./controllers/eventos"
@@ -10,7 +8,6 @@ import (
 )
 
 func main() {
-
   router := SetupRouter()
   router.Run(":8081")
 }
@@ -21,7 +18,7 @@ func SetupRouter() *gin.Engine {
 
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:8888"},
-		AllowMethods:     []string{"POST", "GET", "PUT", "PATCH"},
+		AllowMethods:     []string{"POST", "GET", "PUT", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -30,13 +27,12 @@ func SetupRouter() *gin.Engine {
 	router.GET("/eventos", eventosControllers.GetEventos)
 	router.POST("/eventos", eventosControllers.CreateEvento)
 	router.DELETE("/eventos", eventosControllers.DeleteEvento)
-	router.PUT("/eventos", eventosControllers.ModifyEvento)
+	router.PUT("/eventos", eventosControllers.UpdateEvento)
 
 	router.GET("/tareas", tareasControllers.GetTareas)
 	router.POST("/tareas", tareasControllers.CreateTarea)
 	router.DELETE("/tareas", tareasControllers.DeleteTarea)
 	router.PUT("/tareas", tareasControllers.CompleteTarea)
-
 
 //   v1 := router.Group("api/v1")
 //   {
