@@ -8,13 +8,17 @@ import (
 )
 
 //GetEventos funcion que trae todos los eventos guardados en la base de datos
-func GetEventos() *[]eventosDomain.Eventos {
+func GetEventos(user int64) *[]eventosDomain.Eventos {
 	var (
 		evento eventosDomain.Eventos
 		eventos []eventosDomain.Eventos
 	)
+	stmt, err := db.Init().Prepare("select * from eventos where id_usuario = ?;")
+	if err != nil {
+		fmt.Print(err.Error())
+	}
 
-	rows, err := db.Init().Query("select * from eventos;")
+	rows, err := stmt.Query(user)
 
 	if err != nil {
 		fmt.Print(err.Error())

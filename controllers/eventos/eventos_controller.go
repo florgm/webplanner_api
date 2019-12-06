@@ -5,12 +5,21 @@ import (
 	"net/http"
 	"fmt"
 	"../../utils"
+	"github.com/gin-contrib/sessions"
 	eventosService "../../services/eventos"
+)
+
+const (
+	userkey = 123
 )
 
 //GetEventos esto es una función 
 func GetEventos(c *gin.Context) {
-	eventos := eventosService.GetEventos()
+	session := sessions.Default(c)
+	var user int64
+	user = session.Get(userkey).(int64)
+
+	eventos := eventosService.GetEventos(user)
 	c.JSON(http.StatusOK, eventos)
 }
 
