@@ -1,6 +1,7 @@
 package usuarios
 
 import (
+	"crypto/rand"
     "fmt"
     "github.com/florgm/webplanner_api/src/api/services/sessions"
     "github.com/florgm/webplanner_api/src/api/services/usuarios"
@@ -37,24 +38,32 @@ func Login(c *gin.Context) {
         fmt.Println(err)
         c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed"})
         return
-    }
+	}
+	
+	sessionToken := tokenGenerator()
+	err = sessions.SaveSession(sessionToken, result.IDUsuario)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 
-    if err := sessions.SetLoggedUser(c, result.IDUsuario); err != nil {
-        c.JSON(http.StatusInternalServerError, err.Error())
-        return
-    }
+    c.JSON(http.StatusOK, sessionToken)
+}
 
-    c.JSON(http.StatusOK, gin.H{"message": "Successfully authenticated user"})
+func tokenGenerator() string {
+	b := make([]byte, 4)
+	rand.Read(b)
+	return fmt.Sprintf("%x", b)
 }
 
 //Logout funcion que cierra la sesion del usuario
 func Logout(c *gin.Context) {
-    if err := sessions.Logout(c); err != nil {
-        c.JSON(http.StatusInternalServerError, err.Error())
-        return
-    }
+    // if err := sessions.Logout(c); err != nil {
+    //     c.JSON(http.StatusInternalServerError, err.Error())
+    //     return
+    // }
 
-    c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+    // c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }
 
 //CreateUsuario

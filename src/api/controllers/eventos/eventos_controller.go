@@ -3,7 +3,7 @@ package eventos
 import (
     "fmt"
     eventosService "github.com/florgm/webplanner_api/src/api/services/eventos"
-    sessions2 "github.com/florgm/webplanner_api/src/api/services/sessions"
+    // sessions "github.com/florgm/webplanner_api/src/api/services/sessions"
     "github.com/florgm/webplanner_api/src/api/utils/rest"
     "github.com/gin-gonic/gin"
     "net/http"
@@ -11,10 +11,13 @@ import (
 
 //GetEventos esto es una función
 func GetEventos(c *gin.Context) {
-    eventos := eventosService.GetEventos(
-        sessions2.GetLoggedUser(c),
-    )
-    c.JSON(http.StatusOK, eventos)
+	usuario, exists := c.Get("idUsuario")
+	if (exists) {
+		fmt.Println("ACA ENTRA")
+		eventos := eventosService.GetEventos(usuario)
+		fmt.Println(eventos)
+		c.JSON(http.StatusOK, eventos)
+	}
 }
 
 //CreateEvento esto es una función
