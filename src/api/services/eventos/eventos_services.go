@@ -8,7 +8,7 @@ import (
 )
 
 //GetEventos funcion que trae todos los eventos guardados en la base de datos
-func GetEventos(user interface{}) *[]eventos.Eventos {
+func GetEventos(user int64) *[]eventos.Eventos {
     var (
         evento  eventos.Eventos
         eventos []eventos.Eventos
@@ -19,11 +19,6 @@ func GetEventos(user interface{}) *[]eventos.Eventos {
     }
 
 	rows, err := stmt.Query(user)
-	// rows, err := db.Init().Query("select * from eventos;")
-
-    // if err != nil {
-    //     fmt.Print(err.Error())
-    // }
 
     if err != nil {
         fmt.Print(err.Error())
@@ -62,14 +57,15 @@ func ParseEvento(data []byte) (*eventos.Eventos, error) {
 }
 
 //CreateEvento funcion para insertar eventos en la base de datos
-func CreateEvento(evento *eventos.Eventos) error {
+func CreateEvento(evento *eventos.Eventos, user int64) error {
     stmt, err := db.Init().Prepare("insert into eventos (id_usuario, title, descripcion, color, textColor, start, end) values(?,?,?,?,?,?,?);")
 
     if err != nil {
-        fmt.Print(err.Error())
+		fmt.Print(err.Error())
+		return err
     }
 
-    _, err = stmt.Exec(evento.IDUsuario, evento.Title, evento.Descripcion, evento.Color, evento.TextColor, evento.Start, evento.End)
+    _, err = stmt.Exec(user, evento.Title, evento.Descripcion, evento.Color, evento.TextColor, evento.Start, evento.End)
 
     defer stmt.Close()
     return err

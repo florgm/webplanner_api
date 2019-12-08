@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
     "github.com/florgm/webplanner_api/src/api/controllers/eventos"
     "github.com/florgm/webplanner_api/src/api/controllers/tareas"
@@ -63,6 +64,7 @@ func AuthRequired(c *gin.Context) {
 		}
 		c.Set("idUsuario", idUsuario)
 		c.Next()
+		return
 	}
 
 	c.JSON(http.StatusUnauthorized, "Invalid token")

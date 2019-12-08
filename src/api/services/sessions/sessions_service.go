@@ -3,7 +3,8 @@ package sessions
 import (
 	db "github.com/florgm/webplanner_api/src/api/db"
 	"fmt"
-    "github.com/florgm/webplanner_api/src/api/utils/apierror"
+	"github.com/florgm/webplanner_api/src/api/utils/apierror"
+	"github.com/gin-gonic/gin"
     "net/http"
 )
 
@@ -25,13 +26,15 @@ func GetSession(token string) (int64, *apierror.ApiError) {
     stmt, err := db.Init().Prepare("select user from sessions where token = ?;")
 
     if err != nil {
-		fmt.Print(err.Error())
-        return 0, nil
+        return 0, &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
     }
 
 	result := stmt.QueryRow(token)
 	err = result.Scan(&idUsuario)
-		
+	
 	if err != nil {
 		return 0, &apierror.ApiError {
 			Status: http.StatusUnauthorized,
@@ -41,4 +44,13 @@ func GetSession(token string) (int64, *apierror.ApiError) {
 	
 	defer stmt.Close()
 	return idUsuario, nil	
+}
+
+//ValidateLoggedUser funcion
+func ValidateLoggedUser(c *gin.Context) int64 {
+	usuario, exists := c.Get("idUsuario")
+	if (exists) {
+		return usuario.(int64)
+	}
+	return 0
 }
