@@ -10,7 +10,6 @@ import (
 //SaveSession funcion que guarda la sesion cuando el usuario se loguea
 func SaveSession(token string, idUser int64) *apierror.ApiError {
 	stmt, err := db.Init().Prepare("insert into sessions (token, user) values(?,?);")
-	
 	if err != nil {
         return &apierror.ApiError {
 			Status: http.StatusInternalServerError,
@@ -19,7 +18,6 @@ func SaveSession(token string, idUser int64) *apierror.ApiError {
 	}
 	
 	_, err = stmt.Exec(token, idUser)
-
 	if err != nil {
 		return &apierror.ApiError {
 			Status: http.StatusInternalServerError,

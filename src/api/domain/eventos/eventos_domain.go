@@ -15,10 +15,10 @@ type Eventos struct {
 }
 
 type EventosFeriados struct {
-	Motivo string `json:"motivo"` // String
-	Tipo   string `json:"tipo"`   // String // inamovible | trasladable | nolaborable | puente
-	Dia    int64  `json:"dia"`    // Number // Día del mes
-	Mes    int64  `json:"mes"`    // Number // Número de mes en base 1 (enero = 1)
-	ID     string `json:"id"`     // String // Identificador único de feriado
+	Motivo 	 string `json:"motivo"` // String
+	Tipo   	 string `json:"tipo"`   // String // inamovible | trasladable | nolaborable | puente
+	Dia    	 int  	`json:"dia"`    // Number // Día del mes
+	Mes    	 int  	`json:"mes"`    // Number // Número de mes en base 1 (enero = 1)
+	ID     	 string `json:"id"`     // String // Identificador único de feriado
 	Original string `json:"original"` // String // Fecha original en formato DD-MM
 }

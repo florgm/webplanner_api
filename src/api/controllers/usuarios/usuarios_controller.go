@@ -16,8 +16,8 @@ func Login(c *gin.Context) {
     if err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
         return
-    }
-
+	}
+	
     usuario, err := usuarios.ParseLoginUsuario(data)
     if err != nil {
         c.JSON(http.StatusBadRequest,gin.H{"message": err.Error()})
@@ -25,7 +25,6 @@ func Login(c *gin.Context) {
     }
 
     result, apiErr := usuarios.Login(usuario)
-
     if apiErr != nil {
         c.JSON(apiErr.Status, apiErr.Message)
         return
@@ -40,7 +39,7 @@ func Login(c *gin.Context) {
 	}
 
     c.JSON(http.StatusOK, sessionToken)
-}
+} 
 
 func tokenGenerator() string {
 	b := make([]byte, 4)

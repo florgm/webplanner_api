@@ -56,10 +56,11 @@ func SetupRouter() *gin.Engine {
 }
 
 func AuthRequired(c *gin.Context) {
-	if token := c.Request.Header.Get("Authorization"); len(token) < 0 {
+	if token := c.Request.Header.Get("Authorization"); len(token) > 0 {
 		idUsuario, apiErr := sessions.GetSession(token)
 		if apiErr != nil {
 			c.JSON(apiErr.Status, apiErr.Message)
+			return
 		}
 		c.Set("idUsuario", idUsuario)
 		c.Next()
