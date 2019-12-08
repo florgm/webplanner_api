@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
     "github.com/florgm/webplanner_api/src/api/controllers/eventos"
     "github.com/florgm/webplanner_api/src/api/controllers/tareas"
@@ -28,7 +27,7 @@ func SetupRouter() *gin.Engine {
     router := gin.New()
 
     router.Use(cors.New(cors.Config{
-        AllowOrigins:     []string{"http://localhost:8888"},
+        AllowOrigins:     []string{"*"},
         AllowMethods:     []string{"POST", "GET", "PUT", "DELETE"},
         AllowHeaders:     []string{"Origin", "Content-Type","Authorization"},
         ExposeHeaders:    []string{"Content-Length"},

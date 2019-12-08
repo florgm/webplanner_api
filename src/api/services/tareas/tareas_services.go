@@ -3,22 +3,24 @@ package tareas
 import (
     "encoding/json"
     "fmt"
-    db2 "github.com/florgm/webplanner_api/src/api/db"
+    db "github.com/florgm/webplanner_api/src/api/db"
     "github.com/florgm/webplanner_api/src/api/domain/tareas"
 )
 
 //GetTareas esto es una funcion
-func GetTareas() *[]tareas.Tareas {
+func GetTareas(user int64) *[]tareas.Tareas {
     var (
         tarea  tareas.Tareas
         tareas []tareas.Tareas
     )
 
-    rows, err := db2.Init().Query("select * from tareas;")
+	stmt, err := db.Init().Prepare("select * from tareas where id_usuario = ?;")
 
     if err != nil {
         fmt.Print(err.Error())
-    }
+	}
+	
+	rows, err := stmt.Query(user)
 
     for rows.Next() {
         err = rows.Scan(&tarea.IDUsuario,
@@ -49,23 +51,27 @@ func ParseTarea(data []byte) (*tareas.Tareas, error) {
 }
 
 //CreateTarea esto es una funcion
-func CreateTarea(tarea *tareas.Tareas) error {
-    stmt, err := db2.Init().Prepare("insert into tareas (id_usuario, tarea, completado) values(?,?,?);")
-
+func CreateTarea(tarea *tareas.Tareas, user int64) (idTarea int64, err error) {
+    stmt, err := db.Init().Prepare("insert into tareas (id_usuario, tarea, completado) values(?,?,?);")
     if err != nil {
         fmt.Print(err.Error())
     }
 
-    _, err = stmt.Exec(tarea.IDUsuario, tarea.Tarea, tarea.Completado)
+    res, err := stmt.Exec(user, tarea.Tarea, tarea.Completado)
+	if err != nil {
+        fmt.Print(err.Error())
+	}
+	
+	id, err := res.LastInsertId()
 
     defer stmt.Close()
-    return err
+    return id, err
 }
 
 //DeleteTarea esto es una funcion
 func DeleteTarea(tarea *tareas.Tareas) error {
     id := tarea.IDTarea
-    stmt, err := db2.Init().Prepare("delete from tareas where id_tarea = ?;")
+    stmt, err := db.Init().Prepare("delete from tareas where id_tarea = ?;")
 
     if err != nil {
         fmt.Print(err.Error())
@@ -79,14 +85,23 @@ func DeleteTarea(tarea *tareas.Tareas) error {
 
 //CompleteTarea esto es una funcion
 func CompleteTarea(tarea *tareas.Tareas) error {
-    stmt, err := db2.Init().Prepare("update tareas set completado=? where id_tarea=?;")
-
+    stmt, err := db.Init().Prepare("update tareas set completado=? where id_tarea=?;")
     if err != nil {
         fmt.Print(err.Error())
     }
 
-    _, err = stmt.Exec(tarea.Completado, tarea.IDTarea)
-
+	_, err = stmt.Exec(tarea.Completado, tarea.IDTarea)
     defer stmt.Close()
     return err
+}
+
+//SetTarea funcion
+func SetTarea(user int64, idTarea int64, tareastr string, completado int8) *tareas.Tareas {
+	var tarea tareas.Tareas
+	tarea.IDUsuario = user
+	tarea.IDTarea = idTarea
+	tarea.Tarea = tareastr
+	tarea.Completado = completado
+
+	return &tarea
 }
