@@ -1,13 +1,13 @@
 package usuarios
 
 import (
-    "encoding/json"
-    "fmt"
+	"github.com/florgm/webplanner_api/src/api/domain/usuarios"
+	"github.com/florgm/webplanner_api/src/api/utils/apierror"
     db "github.com/florgm/webplanner_api/src/api/db"
-    "github.com/florgm/webplanner_api/src/api/domain/usuarios"
+	"encoding/json"
+	"net/http"
 )
 
-//ParseLoginUsuario esto es una funcion
 func ParseLoginUsuario(data []byte) (*usuarios.LoginUsuario, error) {
     var usuario usuarios.LoginUsuario
     if err := json.Unmarshal(data, &usuario); err != nil {
@@ -17,7 +17,6 @@ func ParseLoginUsuario(data []byte) (*usuarios.LoginUsuario, error) {
     return &usuario, nil
 }
 
-//ParseUsuario esto es una funcion
 func ParseUsuario(data []byte) (*usuarios.Usuarios, error) {
     var usuario usuarios.Usuarios
     if err := json.Unmarshal(data, &usuario); err != nil {
@@ -27,43 +26,64 @@ func ParseUsuario(data []byte) (*usuarios.Usuarios, error) {
     return &usuario, nil
 }
 
-//CreateUsuario funcion
-func CreateUsuario(usuario *usuarios.Usuarios) error {
+//CreateUsuario crea un usuario
+func CreateUsuario(usuario *usuarios.Usuarios) *apierror.ApiError {
 	stmt, err := db.Init().Prepare("insert into usuarios (nombre, usuario, password) values(?,?,?);")
 
     if err != nil {
-		fmt.Print(err.Error())
-		return err
+		return &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
     }
 
-    _, err = stmt.Exec(usuario.Nombre, usuario.Usuario, usuario.Password)
+	_, err = stmt.Exec(usuario.Nombre, usuario.Usuario, usuario.Password)
+	
+	if err != nil {
+		return &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Error while saving the username data",
+		}
+	}
 
     defer stmt.Close()
-    return err
+    return nil
 }
 
-//UpdateUsuario funcion
-func UpdateUsuario(user int64, usuario *usuarios.Usuarios) error {
+//UpdateUsuario modifica el nombre y la password del usuario
+func UpdateUsuario(user int64, usuario *usuarios.Usuarios) *apierror.ApiError {
 	stmt, err := db.Init().Prepare("update usuarios set nombre=?, password=? where id_usuario=?;")
 
     if err != nil {
-        fmt.Print(err.Error())
+        return &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
     }
 
-    _, err = stmt.Exec(usuario.Nombre, usuario.Password, user)
+	_, err = stmt.Exec(usuario.Nombre, usuario.Password, user)
+	
+	if err != nil {
+		return &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Error while updating the username data",
+		}
+	}
 
     defer stmt.Close()
-    return err
+    return nil
 }
 
-//Login funcion
-func Login(usuario *usuarios.LoginUsuario) (*usuarios.Usuarios, error) {
+//Login comprueba que el usuario esta registrado en la pagina
+func Login(usuario *usuarios.LoginUsuario) (*usuarios.Usuarios, *apierror.ApiError) {
     var user usuarios.Usuarios
     stmt, err := db.Init().Prepare("select * from usuarios where usuario = ? and password = ?;")
 
     if err != nil {
-		fmt.Print(err.Error())
-        return nil, err
+		return nil, &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
     }
 
 	result := stmt.QueryRow(usuario.Usuario, usuario.Password)
@@ -74,22 +94,36 @@ func Login(usuario *usuarios.LoginUsuario) (*usuarios.Usuarios, error) {
 		&user.Password)
 		
 	if err != nil {
-		return nil, err
+		return nil, &apierror.ApiError {
+			Status: http.StatusUnauthorized,
+			Message: "Wrong username or password",
+		}
 	}
 	
 	defer stmt.Close()
     return &user, nil
 }
 
-//Logout funcion
-func Logout(user int64) error {
+//Logout elimina la sesion del usuario y lo desloguea
+func Logout(user int64) *apierror.ApiError {
     stmt, err := db.Init().Prepare("delete from sessions where user = ?;")
 
     if err != nil {
-        fmt.Print(err.Error())
-    }
-    _, err = stmt.Exec(user)
+        return &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
+	}
+	
+	_, err = stmt.Exec(user)
+	
+	if err != nil {
+		return &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
+	}
 
     defer stmt.Close()
-    return err
+    return nil
 }
