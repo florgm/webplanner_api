@@ -5,20 +5,93 @@ import (
     "fmt"
     db "github.com/florgm/webplanner_api/src/api/db"
 	"github.com/florgm/webplanner_api/src/api/domain/eventos"
+    "io/ioutil"
+    eventos2 "src/github.com/florgm/webplanner_api/src/api/domain/eventos"
+    "src/github.com/florgm/webplanner_api/src/api/utils/apierror"
+    "net/http"
+    "strconv"
+    "time"
 )
 
 //GetEventos funcion que trae todos los eventos guardados en la base de datos
 func GetEventos(user int64) *[]eventos.Eventos {
+
+    channel := make(chan []eventos.Eventos)
+
+
+
+	go getFeriados(channel,user,2019)
+    go getFeriados(channel,user,2020)
+    go getEventosDB(channel,user)
+
+
+
+    eventos := <- channel
+	eventos = append(eventos, <- channel)
+    eventos = append(eventos, <- channel)
+
+    return &eventos
+}
+
+func getFeriados(channel chan []eventos.Eventos,user int64, year int){
+
+    url := "http://nolaborables.com.ar/api/v2/feriados/"
+    yearStr := strconv.Itoa(year)
+
+    url = url + yearStr
+
+    var(
+        eventos []Eventos
+        evento Eventos
+        feriados []EventosFeriados
+    )
+
+    resp, err := http.Get(url)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    data, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    err = json.Unmarshal(data, &feriados)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    for u := 0; u < len(feriados); u++ {
+        evento.IDUsuario = user
+        evento.IDEvento = 0
+        evento.Title = feriados[u].Motivo
+        evento.Descripcion = feriados[u].ID
+        evento.Color = "#2ECC71"
+        evento.TextColor = "#FFFFFF"
+        evento.Start = time.Date(year,time.Month(feriados[u].Mes),feriados[u].Dia,0,0,0,0,time.UTC)
+        evento.End = evento.Start
+
+        eventos = append(eventos, evento)
+
+    }
+
+    channel <- eventos
+
+}
+
+func getEventosDB (channel chan []eventos.Eventos, user int64){
+
     var (
         evento  eventos.Eventos
         eventos []eventos.Eventos
+
     )
     stmt, err := db.Init().Prepare("select * from eventos where id_usuario = ?;")
     if err != nil {
         fmt.Print(err.Error())
     }
 
-	rows, err := stmt.Query(user)
+    rows, err := stmt.Query(user)
 
     if err != nil {
         fmt.Print(err.Error())
@@ -43,8 +116,9 @@ func GetEventos(user int64) *[]eventos.Eventos {
 
     defer rows.Close()
 
-    return &eventos
+    channel <- eventos
 }
+
 
 //ParseEvento esto es una funcion
 func ParseEvento(data []byte) (*eventos.Eventos, error) {
@@ -98,3 +172,4 @@ func ModifyEvento(evento *eventos.Eventos) error {
     defer stmt.Close()
     return err
 }
+
