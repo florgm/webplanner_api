@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
     "github.com/florgm/webplanner_api/src/api/controllers/eventos"
     "github.com/florgm/webplanner_api/src/api/controllers/tareas"
@@ -34,8 +35,8 @@ func SetupRouter() *gin.Engine {
         AllowCredentials: true,
     }))
 
-    router.POST("/login", usuarios.Login)
-    router.GET("/logout", usuarios.Logout)
+	router.POST("/login", usuarios.Login)
+	router.POST("/usuarios", usuarios.CreateUsuario)
 	
     auth := router.Group("/auth")
     auth.Use(AuthRequired)
@@ -48,7 +49,10 @@ func SetupRouter() *gin.Engine {
         auth.GET("/tareas", tareas.GetTareas)
         auth.POST("/tareas", tareas.CreateTarea)
         auth.DELETE("/tareas", tareas.DeleteTarea)
-        auth.PUT("/tareas", tareas.CompleteTarea)
+		auth.PUT("/tareas", tareas.CompleteTarea)
+		
+		auth.GET("/logout", usuarios.Logout)
+		auth.PUT("/usuarios", usuarios.UpdateUsuario)
     }
 
     return router
@@ -65,7 +69,5 @@ func AuthRequired(c *gin.Context) {
 		c.Next()
 		return
 	}
-
 	c.JSON(http.StatusUnauthorized, "Invalid token")
-	return 
 }
