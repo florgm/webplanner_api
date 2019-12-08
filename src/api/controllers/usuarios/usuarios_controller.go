@@ -1,40 +1,41 @@
 package usuarios
 
 import (
-	"crypto/rand"
-    "fmt"
-    "github.com/florgm/webplanner_api/src/api/services/sessions"
+	"github.com/florgm/webplanner_api/src/api/services/sessions"
     "github.com/florgm/webplanner_api/src/api/services/usuarios"
-    "github.com/florgm/webplanner_api/src/api/utils/rest"
-    "github.com/gin-gonic/gin"
-    "net/http"
+	"github.com/florgm/webplanner_api/src/api/utils/rest"
+	"github.com/gin-gonic/gin"
+	"crypto/rand"
+	"net/http"
+    "fmt"
 )
 
-//Login funcion para logguear al usuario a la pagina web
+//Login loguea al usuario a la pagina
 func Login(c *gin.Context) {
     data, err := rest.GetJSONBody(c.Request)
     if err != nil {
-        c.JSON(http.StatusBadRequest,err)
+        c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
         return
     }
 
     usuario, err := usuarios.ParseLoginUsuario(data)
     if err != nil {
-        c.JSON(http.StatusBadRequest,err)
+        c.JSON(http.StatusBadRequest,gin.H{"message": err.Error()})
         return
     }
 
-    result, err := usuarios.Login(usuario)
+    result, apiErr := usuarios.Login(usuario)
 
-    if err != nil {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed"})
+    if apiErr != nil {
+        c.JSON(apiErr.Status, apiErr.Message)
         return
 	}
 	
 	sessionToken := tokenGenerator()
-	err = sessions.SaveSession(sessionToken, result.IDUsuario)
-	if err != nil {
-		fmt.Println(err.Error())
+	
+	apiErr = sessions.SaveSession(sessionToken, result.IDUsuario)
+	if apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
 		return
 	}
 
@@ -47,63 +48,67 @@ func tokenGenerator() string {
 	return fmt.Sprintf("%x", b)
 }
 
-//Logout funcion que cierra la sesion del usuario
+//Logout cierra la sesion del usuario
 func Logout(c *gin.Context) {
-	if user := sessions.ValidateLoggedUser(c); user > 0 {
-		if err := usuarios.Logout(user); err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
-        	return
-		}
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
+	user, apiErr := sessions.ValidateLoggedUser(c); 
+	if apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
 		return
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "Error with the get of context"})
+
+	if apiErr := usuarios.Logout(user); apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully logged out"})
 }
 
-//CreateUsuario funcion
+//CreateUsuario permite crear un usuario
 func CreateUsuario (c *gin.Context) {
 	data, err := rest.GetJSONBody(c.Request)
     if err != nil {
-        c.JSON(http.StatusBadRequest,err)
+        c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
         return
     }
 
     usuario, err := usuarios.ParseUsuario(data)
     if err != nil {
-        c.JSON(http.StatusBadRequest,err)
+        c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
         return
     }
 		
-	if err := usuarios.CreateUsuario(usuario); err != nil {
-		c.JSON(http.StatusInternalServerError,err)
+	if apiErr := usuarios.CreateUsuario(usuario); apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Successfully created"})
 }
 
-//UpdateUsuario funcion
+//UpdateUsuario permite modificar el nombre y la password del usuario
 func UpdateUsuario (c *gin.Context) {
-	if user := sessions.ValidateLoggedUser(c); user > 0 {
-		data, err := rest.GetJSONBody(c.Request)
-		if err != nil {
-			c.JSON(http.StatusBadRequest,err)
-			return
-		}
-
-		usuario, err := usuarios.ParseUsuario(data)
-		if err != nil {
-			c.JSON(http.StatusBadRequest,err)
-			return
-		}
-
-		if err := usuarios.UpdateUsuario(user, usuario); err != nil {
-			c.JSON(http.StatusInternalServerError,err)
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully modified"})
+	user, apiErr := sessions.ValidateLoggedUser(c);
+	if apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
 		return
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "Error with the get of context"})
+
+	data, err := rest.GetJSONBody(c.Request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	usuario, err := usuarios.ParseUsuario(data)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	if apiErr := usuarios.UpdateUsuario(user, usuario); apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully modified"})
 }

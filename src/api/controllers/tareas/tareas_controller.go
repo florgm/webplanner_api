@@ -1,99 +1,122 @@
 package tareas
 
 import (
-	"net/http"
-	"github.com/florgm/webplanner_api/src/api/services/sessions"
 	tareas "github.com/florgm/webplanner_api/src/api/services/tareas"
+	"github.com/florgm/webplanner_api/src/api/services/sessions"
 	"github.com/florgm/webplanner_api/src/api/utils/rest"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-//GetTareas esto es una funcion
+//GetTareas devuelve todas las tareas del usuario logueado
 func GetTareas(c *gin.Context) {
-	if user := sessions.ValidateLoggedUser(c); user > 0 {
-		tareas := tareas.GetTareas(user)
-		c.JSON(http.StatusOK, tareas)
-		return
+	user, apiErr := sessions.ValidateLoggedUser(c);
+	if apiErr != nil {
+		if apiErr != nil {
+			c.JSON(apiErr.Status, apiErr.Message)
+			return
+		}
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "Error with the get of context"})
+
+	tareas, apiErr := tareas.GetTareas(user)
+	if apiErr != nil {
+		if apiErr != nil {
+			c.JSON(apiErr.Status, apiErr.Message)
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, tareas)
 }
 
-//CreateTarea esto es una funcion
+//CreateTarea crea una nueva tarea para el usuario logueado
 func CreateTarea(c *gin.Context) {
-	if user := sessions.ValidateLoggedUser(c); user > 0 {
-		data, err := rest.GetJSONBody(c.Request)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
+	user, apiErr := sessions.ValidateLoggedUser(c);
+	if apiErr != nil {
+		if apiErr != nil {
+			c.JSON(apiErr.Status, apiErr.Message)
 			return
 		}
+	}
 
-		tr, err := tareas.ParseTarea(data)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
-
-		idTarea, err := tareas.CreateTarea(tr, user); 
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-
-		tarea := tareas.SetTarea(user, idTarea, tr.Tarea, tr.Completado)
-		c.JSON(http.StatusOK, tarea)
+	data, err := rest.GetJSONBody(c.Request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "Error with the get of context"})
+
+	tr, err := tareas.ParseTarea(data)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	idTarea, apiErr := tareas.CreateTarea(tr, user); 
+	if err != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
+		return
+	}
+
+	tarea := tareas.SetTarea(user, idTarea, tr.Tarea, tr.Completado)
+	c.JSON(http.StatusOK, tarea)
 }
 
-//DeleteTarea esto es una funcion
+//DeleteTarea borra una tarea especifica
 func DeleteTarea(c *gin.Context) {
-	if user := sessions.ValidateLoggedUser(c); user > 0 {
-		data, err := rest.GetJSONBody(c.Request)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
+	_, apiErr := sessions.ValidateLoggedUser(c);
+	if apiErr != nil {
+		if apiErr != nil {
+			c.JSON(apiErr.Status, apiErr.Message)
 			return
 		}
+	}
 
-		tarea, err := tareas.ParseTarea(data)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
-
-		if err := tareas.DeleteTarea(tarea); err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted"})
+	data, err := rest.GetJSONBody(c.Request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "Error with the get of context"})
+
+	tarea, err := tareas.ParseTarea(data)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	if apiErr := tareas.DeleteTarea(tarea); apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully deleted"})
 }
 
-//CompleteTarea esto es una funcion
+//CompleteTarea modifica una tarea pasando su estado a completado
 func CompleteTarea(c *gin.Context) {
-	if user := sessions.ValidateLoggedUser(c); user > 0 {
-		data, err := rest.GetJSONBody(c.Request)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
+	_, apiErr := sessions.ValidateLoggedUser(c);
+	if apiErr != nil {
+		if apiErr != nil {
+			c.JSON(apiErr.Status, apiErr.Message)
 			return
 		}
+	}
 
-		tarea, err := tareas.ParseTarea(data)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
-			return
-		}
-
-		if err := tareas.CompleteTarea(tarea); err != nil {
-			c.JSON(http.StatusInternalServerError, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"message": "Successfully modified"})
+	data, err := rest.GetJSONBody(c.Request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
-	c.JSON(http.StatusInternalServerError, gin.H{"message": "Error with the get of context"})
+
+	tarea, err := tareas.ParseTarea(data)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	if apiErr := tareas.CompleteTarea(tarea); apiErr != nil {
+		c.JSON(apiErr.Status, apiErr.Message)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Successfully modified"})
 }
