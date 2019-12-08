@@ -1,4 +1,4 @@
-api
+src/api/api 
 .idea/
 .vscode/
 *.DS_Store
