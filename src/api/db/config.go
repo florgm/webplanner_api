@@ -15,7 +15,6 @@ func Init() (*sql.DB) {
 
     err = db.Ping()
     checkErr(err)
-    fmt.Printf("Connection successfully")
 
     return db
 }

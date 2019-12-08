@@ -1,40 +1,56 @@
 package sessions
 
 import (
-    "github.com/florgm/webplanner_api/src/api/utils/apierror"
-    "github.com/gin-contrib/sessions"
-    "github.com/gin-gonic/gin"
+	db "github.com/florgm/webplanner_api/src/api/db"
+	"fmt"
+	"github.com/florgm/webplanner_api/src/api/utils/apierror"
+	"github.com/gin-gonic/gin"
     "net/http"
 )
 
-const (
-    userKey = 123
-)
+//SaveSession funcion
+func SaveSession(token string, idUser int64) error {
+	stmt, err := db.Init().Prepare("insert into sessions (token, user) values(?,?);")
+	if err != nil {
+        fmt.Print(err.Error())
+	}
+	
+	_, err = stmt.Exec(token, idUser)
+	defer stmt.Close()
+	return err
+}
 
-func ValidateLoggedUser(c *gin.Context) (int64, *apierror.ApiError) {
-    session := sessions.Default(c)
-    user := session.Get(userKey)
-    if user == nil {
-        return 0, &apierror.ApiError{
-            Status:  http.StatusUnauthorized,
-            Message: "unauthorized",
-        }
+//GetSession funcion
+func GetSession(token string) (int64, *apierror.ApiError) {
+	var idUsuario int64
+    stmt, err := db.Init().Prepare("select user from sessions where token = ?;")
+
+    if err != nil {
+        return 0, &apierror.ApiError {
+			Status: http.StatusInternalServerError,
+			Message: "Data base error",
+		}
     }
-    return user.(int64), nil
+
+	result := stmt.QueryRow(token)
+	err = result.Scan(&idUsuario)
+	
+	if err != nil {
+		return 0, &apierror.ApiError {
+			Status: http.StatusUnauthorized,
+			Message: "Invalid Token",
+		}
+	}
+	
+	defer stmt.Close()
+	return idUsuario, nil	
 }
 
-func GetLoggedUser(c *gin.Context) int64 {
-    return sessions.Default(c).Get(userKey).(int64)
-}
-
-func SetLoggedUser(c *gin.Context, userID int64) error {
-    session := sessions.Default(c)
-    session.Set(userKey, userID)
-    return session.Save()
-}
-
-func Logout(c *gin.Context) error {
-    session := sessions.Default(c)
-    session.Delete(userKey)
-    return session.Save()
+//ValidateLoggedUser funcion
+func ValidateLoggedUser(c *gin.Context) int64 {
+	usuario, exists := c.Get("idUsuario")
+	if (exists) {
+		return usuario.(int64)
+	}
+	return 0
 }

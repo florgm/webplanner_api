@@ -3,8 +3,8 @@ package eventos
 import (
     "encoding/json"
     "fmt"
-    db2 "github.com/florgm/webplanner_api/src/api/db"
-    "github.com/florgm/webplanner_api/src/api/domain/eventos"
+    db "github.com/florgm/webplanner_api/src/api/db"
+	"github.com/florgm/webplanner_api/src/api/domain/eventos"
 )
 
 //GetEventos funcion que trae todos los eventos guardados en la base de datos
@@ -13,12 +13,12 @@ func GetEventos(user int64) *[]eventos.Eventos {
         evento  eventos.Eventos
         eventos []eventos.Eventos
     )
-    stmt, err := db2.Init().Prepare("select * from eventos where id_usuario = ?;")
+    stmt, err := db.Init().Prepare("select * from eventos where id_usuario = ?;")
     if err != nil {
         fmt.Print(err.Error())
     }
 
-    rows, err := stmt.Query(user)
+	rows, err := stmt.Query(user)
 
     if err != nil {
         fmt.Print(err.Error())
@@ -57,14 +57,15 @@ func ParseEvento(data []byte) (*eventos.Eventos, error) {
 }
 
 //CreateEvento funcion para insertar eventos en la base de datos
-func CreateEvento(evento *eventos.Eventos) error {
-    stmt, err := db2.Init().Prepare("insert into eventos (id_usuario, title, descripcion, color, textColor, start, end) values(?,?,?,?,?,?,?);")
+func CreateEvento(evento *eventos.Eventos, user int64) error {
+    stmt, err := db.Init().Prepare("insert into eventos (id_usuario, title, descripcion, color, textColor, start, end) values(?,?,?,?,?,?,?);")
 
     if err != nil {
-        fmt.Print(err.Error())
+		fmt.Print(err.Error())
+		return err
     }
 
-    _, err = stmt.Exec(evento.IDUsuario, evento.Title, evento.Descripcion, evento.Color, evento.TextColor, evento.Start, evento.End)
+    _, err = stmt.Exec(user, evento.Title, evento.Descripcion, evento.Color, evento.TextColor, evento.Start, evento.End)
 
     defer stmt.Close()
     return err
@@ -73,7 +74,7 @@ func CreateEvento(evento *eventos.Eventos) error {
 //DeleteEvento esto es una funcion
 func DeleteEvento(evento *eventos.Eventos) error {
     id := evento.IDEvento
-    stmt, err := db2.Init().Prepare("delete from eventos where id_evento = ?;")
+    stmt, err := db.Init().Prepare("delete from eventos where id_evento = ?;")
 
     if err != nil {
         fmt.Print(err.Error())
@@ -86,7 +87,7 @@ func DeleteEvento(evento *eventos.Eventos) error {
 
 //ModifyEvento funcion para modificar eventos en la base de datos
 func ModifyEvento(evento *eventos.Eventos) error {
-    stmt, err := db2.Init().Prepare("update eventos set title=?, descripcion=?, color=?, textColor=?, start=?, end=? where id_evento=?;")
+    stmt, err := db.Init().Prepare("update eventos set title=?, descripcion=?, color=?, textColor=?, start=?, end=? where id_evento=?;")
 
     if err != nil {
         fmt.Print(err.Error())
