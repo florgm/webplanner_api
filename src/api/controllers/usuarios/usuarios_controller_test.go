@@ -15,8 +15,8 @@ func TestLoginBadJson(t *testing.T) {
     c.Request, err = http.NewRequest(http.MethodPost, "/login", body)
     if err != nil {
         t.Error(err)
-    }
-
+	}
+	
     Login(c)
     if c.Writer.Status() != http.StatusBadRequest {
         t.Error("Se esperaba un status bad request");
