@@ -13,7 +13,7 @@ func TestParseUsuarioFail(t *testing.T) {
 }
 
 func TestParseUsuarioOk(t *testing.T) {
-	b := []byte(`{"id_usuario": 1, "id_tarea": 1, "title": "hola"}`)
+	b := []byte(`{"id_usuario": 1, "nombre": "asdf", "usuario": "a@a", "password": "123"}`)
 	_, err := ParseUsuario(b)
 	if err != nil {
 		t.Errorf("No se esperaba error: %v", err)
@@ -29,7 +29,7 @@ func TestParseLoginUsuarioFail(t *testing.T) {
 }
 
 func TestParseLoginUsuarioOk(t *testing.T) {
-	b := []byte(`{"id_usuario": 1, "id_tarea": 1, "title": "hola"}`)
+	b := []byte(`{"usuario": "a@a", "password": "123"}`)
 	_, err := ParseLoginUsuario(b)
 	if err != nil {
 		t.Errorf("No se esperaba error: %v", err)

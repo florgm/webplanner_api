@@ -11,7 +11,7 @@ func TestGetJSONBodyFail(t *testing.T) {
 	request.Body = nil
 	_, err := GetJSONBody(request)
 	if err == nil {
-		t.Errorf("Se esperaba un error")
+		t.Error("Se esperaba un error")
 	}
 }
 
@@ -19,6 +19,6 @@ func TestGetJSONBodyOk(t *testing.T) {
 	request := httptest.NewRequest("GET", "/", strings.NewReader("algo"))
 	_, err := GetJSONBody(request)
 	if err != nil {
-		t.Errorf("Se esperaba un error")
+		t.Error("Se esperaba un error")
 	}
 }

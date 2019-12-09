@@ -22,6 +22,6 @@ func TestValidateLoggedUsserFail(t *testing.T) {
 
 	_, err := ValidateLoggedUser(c)
 	if err == nil {
-		t.Errorf("El usuario No tendria que existir")
+		t.Errorf("El usuario no tendria que existir")
 	}
 }

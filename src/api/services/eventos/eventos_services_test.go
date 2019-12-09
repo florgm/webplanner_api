@@ -8,7 +8,7 @@ func TestParseEventoFail(t *testing.T) {
 	var data []byte
 	_, err := ParseEvento(data)
 	if err == nil {
-		t.Errorf("Se esperaba un error")
+		t.Error("Se esperaba un error")
 	}
 }
 
