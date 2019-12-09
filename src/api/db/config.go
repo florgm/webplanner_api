@@ -9,7 +9,7 @@ import (
 
 //Init funcion que inicializa la conexion con la base de datos
 func Init() *sql.DB {
-	db, err := sql.Open("mysql", "calendario:asd123**@tcp(157.245.129.202:3306)/calendario?parseTime=true")
+	db, err := sql.Open("mysql", "root:root@tcp(localhost:8888)/calendario?parseTime=true")
 	checkErr(err)
 
 	// defer db.Close()
