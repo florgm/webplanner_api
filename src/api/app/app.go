@@ -17,7 +17,7 @@ var (
 )
 
 func Run() {
-	if err := router.Run(":80"); err != nil {
+	if err := router.Run(); err != nil {
 		fmt.Println(err.Error())
 	}
 }
