@@ -1,14 +1,15 @@
 package app
 
 import (
-	"github.com/florgm/webplanner_api/src/api/controllers/usuarios"
+	"fmt"
+	"net/http"
+
 	"github.com/florgm/webplanner_api/src/api/controllers/eventos"
 	"github.com/florgm/webplanner_api/src/api/controllers/tareas"
+	"github.com/florgm/webplanner_api/src/api/controllers/usuarios"
 	"github.com/florgm/webplanner_api/src/api/services/sessions"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"fmt"
 )
 
 var (
@@ -16,7 +17,7 @@ var (
 )
 
 func Run() {
-	if err := router.Run(":8081"); err != nil {
+	if err := router.Run(":80"); err != nil {
 		fmt.Println(err.Error())
 	}
 }
